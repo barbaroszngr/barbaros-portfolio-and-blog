@@ -6,19 +6,19 @@ import { Analytics } from "./components/analytics";
 
 export const metadata: Metadata = {
   title: {
-    default: "chronark.com",
-    template: "%s | chronark.com",
+    default: "barbaroszongur.com",
+    template: "%s | barbaroszongur.com",
   },
-  description: "Co-founder of unkey.dev and founder of planetfall.io",
+  description: "A personal portfolio and blog website showcasing my projects, skills, and experiences. Explore my latest work, read insightful blog posts, and learn more about my journey in software development.",
   openGraph: {
-    title: "chronark.com",
+    title: "barbaroszongur.com",
     description:
-      "Co-founder of unkey.dev and founder of planetfall.io",
-    url: "https://chronark.com",
-    siteName: "chronark.com",
+      "A personal portfolio and blog website showcasing my projects, skills, and experiences. Explore my latest work, read insightful blog posts, and learn more about my journey in software development.",
+    url: "https://barbaroszongur.com",
+    siteName: "barbaroszongur.com",
     images: [
       {
-        url: "https://chronark.com/og.png",
+        url: "https://barbaroszongur.com/og.png",
         width: 1920,
         height: 1080,
       },
