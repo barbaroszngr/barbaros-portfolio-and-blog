@@ -8,7 +8,10 @@ import {
 
 import { MouseEventHandler, PropsWithChildren } from "react";
 
-export const Card: React.FC<PropsWithChildren> = ({ children }) => {
+type CardProps = {
+	children: React.ReactNode;
+};
+export const Card = ({ children }: CardProps) => {
 	const mouseX = useSpring(0, { stiffness: 500, damping: 100 });
 	const mouseY = useSpring(0, { stiffness: 500, damping: 100 });
 

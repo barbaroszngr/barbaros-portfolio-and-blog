@@ -7,21 +7,21 @@ import { Card } from "../components/card";
 const socials = [
 	{
 		icon: <Twitter size={20} />,
-		href: "https://twitter.com/chronark_",
+		href: "https://x.com/barbaroszongur",
 		label: "Twitter",
-		handle: "@chronark_",
+		handle: "@barbaroszongur",
 	},
 	{
 		icon: <Mail size={20} />,
-		href: "mailto:dev@chronark.com",
+		href: "mailto:barbaroszongur22@gmail.com",
 		label: "Email",
-		handle: "dev@chronark.com",
+		handle: "barbaroszongur22@gmail.com",
 	},
 	{
 		icon: <Github size={20} />,
-		href: "https://github.com/chronark",
+		href: "https://github.com/barbaroszngr",
 		label: "Github",
-		handle: "chronark",
+		handle: "barbaroszngr",
 	},
 ];
 
@@ -32,7 +32,7 @@ export default function Example() {
 			<div className="container flex items-center justify-center min-h-screen px-4 mx-auto">
 				<div className="grid w-full grid-cols-1 gap-8 mx-auto mt-32 sm:mt-0 sm:grid-cols-3 lg:gap-16">
 					{socials.map((s) => (
-						<Card>
+						<Card key={s.label}>
 							<Link
 								href={s.href}
 								target="_blank"
