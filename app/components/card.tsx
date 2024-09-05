@@ -44,3 +44,5 @@ export const Card = ({ children }: CardProps) => {
 		</div>
 	);
 };
+
+
