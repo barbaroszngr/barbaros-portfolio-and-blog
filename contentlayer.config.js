@@ -24,6 +24,7 @@ export const Project = defineDocumentType(() => ({
 	fields: {
 		published: {
 			type: "boolean",
+			required: true, // Bu alanı zorunlu hale getirelim
 		},
 		title: {
 			type: "string",
