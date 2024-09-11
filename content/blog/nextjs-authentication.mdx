@@ -1,0 +1,344 @@
+---
+title: Next.js’te Kimlik Doğrulama  Kapsamlı Rehber
+date: 2024-08-22
+description: Bu makalede Next.js ortamında güvenli kimlik doğrulamanın nasıl gerçekleştirileceğini ve bu süreçte dikkat edilmesi gereken konuları ele alacağım. Kullanıcı verilerini korumak ve uygulamanızda güçlü bir güvenlik altyapısı oluşturmak için kullanabileceğiniz yöntemleri inceleyeceğiz.
+---
+
+### 1. Giriş
+
+Dijital dünyada kimlik doğrulama, güvenlikten kullanıcı deneyimine kadar birçok alanda kritik rol oynar. **Özellikle kişisel verilerin korunması ve kullanıcıların güvenliği söz konusu olduğunda, kimlik doğrulama sistemlerinin doğru ve etkili bir şekilde uygulanması hayati önem taşır.** Şirketlerin güvenilirliği, yasal sorumlulukları ve kullanıcıların sistemlere olan güveni, büyük ölçüde bu süreçlerin ne kadar güçlü olduğuna bağlıdır.
+
+> Next.js, React tabanlı bir framework olarak, çeşitli kimlik doğrulama stratejilerini ve kütüphanelerini sisteme kolayca entegre etmenize olanak tanır. Next.js’in sunduğu server-side rendering (SSR), Middleware, API Routes (Pages Router için) ve Route Handlers (App Router için) gibi özellikler, güvenli ve etkili kimlik doğrulama uygulamaları geliştirmeyi destekler. Ayrıca Next.js’in Server Components ve Server Actions gibi yeni özellikleri, kimlik doğrulama süreçlerini daha da güvenli ve verimli hale getirmeye yardımcı olur.
+
+### 2. Authentication (Kimlik Doğrulama) Nedir?
+Authentication, dijital kimlik doğrulama sürecidir ve modern bilgi güvenliğinin temelidir. **“Sen kimsin?”** sorusuna net bir yanıt arayan bu süreç, kullanıcıların veya sistemlerin kimliklerini doğrular. Bu süreç, basit bir kullanıcı adı ve şifre kombinasyonundan biyometrik verilere ve iki faktörlü veya çok faktörlü kimlik doğrulamaya kadar uzanan çeşitli yöntemlerle gerçekleştirilir.
+
+**Authentication’ın temel amacı,** belli bir dijital ortama erişmeye çalışan kişinin veya sistemin gerçekten iddia ettiği kimliğe sahip olduğunu doğrulamaktır. Bu doğrulama, güvenli bir dijital ortamın oluşturulmasında ve sürdürülmesinde kritik bir rol oynar. **Doğru uygulanan authentication yöntemleri veri güvenliğini artırır ve kullanıcı güvenini pekiştirir.**
+
+### 3. Kimlik Doğrulama ve KVKK İlişkisi
+Kimlik doğrulama; e-ticaret, bankacılık, eğitim, sağlık ve lojistik gibi birçok sektörde hem kullanıcılar hem de şirketler için çok önemlidir. Türkiye’de **Kişisel Verilerin Korunması Kanunu (KVKK), kişisel verilerin güvenliğini sağlama yükümlülüğü getirir,** bu da kimlik doğrulamanın kritik bir araç olduğunu bize gösterir.
+
+Next.js, bu gereksinimlere uyum sağlamak amacıyla esnek ve güvenli kimlik doğrulama çözümleri sunar. Güçlü kimlik doğrulama süreçleri, hem kullanıcıların verilerini korur hem de şirketlerin yasal uyumluluğunu garanti altına alır.
+
+### 4. Next.js’te Kimlik Doğrulama
+
+Next.js uygulamalarında kimlik doğrulama, kullanıcıların kimliklerini doğrulamayı ve bu kimlik bilgilerini güvenli bir şekilde yönetmeyi içerir. Aşağıdaki bölümlerde kimlik doğrulama süreçlerini uygulamak için kullanılan bazı temel kavramları ve kod örneklerini inceleyeceğiz.
+
+![](https://miro.medium.com/v2/resize:fit:828/format:webp/1*6_6noBUY_QLknJRIFW9ktw.jpeg)
+*Next.js’te kimlik doğrulama sürecinin genel akışı: İstemci tarafından başlatılan işlemler, sunucu tarafında doğrulama, oturum yönetimi ve yetkilendirme aşamaları.*
+
+#### 4.1. Authentication (Kimlik Doğrulama)
+
+Kullanıcının iddia ettiği kişi olduğunu doğrular ve genellikle kullanıcı adı ve şifre gibi bilgilerle gerçekleştirilir. Next.js’in App Router yapısında, bu işlem genellikle Route Handlers kullanılarak gerçekleştirilir.
+
+Örnek:
+
+```javascript
+// app/api/auth/login/route.js
+import { NextResponse } from 'next/server';
+import { compare } from 'bcrypt';
+import { SignJWT } from 'jose';
+import { cookies } from 'next/headers';
+
+export async function POST(request) {
+  const { email, password } = await request.json();
+
+// Kullanıcı doğrulama (Örnek veritabanı sorgusu ile karşılaştırma)
+  const user = await db.user.findFirst({ where: { email } });
+  const isPasswordValid = await compare(password, user.password);
+
+  if (!isPasswordValid) {
+    return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
+  }
+
+  const token = await new SignJWT({ userId: user.id })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('1h')
+    .sign(new TextEncoder().encode(process.env.JWT_SECRET));
+
+  cookies().set('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 3600,
+    path: '/',
+  });
+
+  return NextResponse.json({ message: 'Authenticated successfully' }, { status: 200 });
+}
+```
+
+#### 4.2. Session Management (Oturum Yönetimi)
+Bir kullanıcının web uygulamasıyla etkileşimini sürdürdüğü süre boyunca kimlik bilgilerini ve durumunu koruyan bir mekanizmadır.
+
+> Bir oturum (session), kullanıcının web uygulamasıyla etkileşimde bulunduğu belirli bir zaman dilimini ifade eder. Genellikle kullanıcının kimlik doğrulaması yapmasıyla başlar ve oturumu kapatması veya belirli bir süre işlem yapmaması sonucu sona erer.
+>
+>Bu sistem, kullanıcı giriş yaptıktan sonra her sayfa yüklemesinde veya API çağrısında kullanıcının kimliğini yeniden doğrulamaya gerek kalmadan kullanıcının oturum açmış durumda kalmasını sağlar. Böylece kullanıcı, uygulamayı kullanırken sürekli olarak kimlik bilgilerini girmek zorunda kalmaz ve kesintisiz bir deneyim yaşar.	
+
+Next.js’te oturumlar, sunucu taraflı (server-side) veya istemci taraflı (client-side) olarak yönetilebilir.
+
+- **Sunucu taraflı oturum** yönetiminde oturum bilgileri sunucuda saklanır ve her istekle birlikte sunucu tarafından doğrulanır. Bu yöntem daha güvenli kabul edilir çünkü hassas veriler sunucuda tutulur. Ancak yüksek trafikte ölçeklenmesi zor olabilir.
+
+- **İstemci taraflı oturum** yönetiminde ise JWT gibi token’lar istemcide (genellikle tarayıcıda) saklanır ve her istekte sunucuya gönderilir. Bu yöntem daha ölçeklenebilir olsa da token’ların güvenliği kullanıcı cihazında korunmalıdır.
+
+Örnek (NextAuth.js kullanarak):
+
+```javascript
+// app/api/auth/[...nextauth]/route.js
+import NextAuth from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+
+export const authOptions = {
+  providers: [
+    CredentialsProvider({
+      // Kimlik doğrulama mantığı
+      name: 'Credentials',
+      credentials: {
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        // Veritabanında kullanıcı doğrulama
+        const user = await db.user.findFirst({ where: { username: credentials.username } 
+        });
+        if (user && verifyPassword(user.password, credentials.password)) {
+          return user;
+        }
+        return null;
+      }
+    })
+  ],
+  session: {
+    strategy: "jwt", // JWT tabanlı oturum yönetimi
+    maxAge: 60 * 15, 
+    updateAge: 60 * 5, 
+  },
+  callbacks: {
+    async session({ session, token }) {
+      // Oturum nesnesine ek bilgiler ekleyebilirsiniz.
+      session.user.id = token.sub;
+      return session;
+    },
+    async jwt({ token, user }) {
+      // JWT'ye ek bilgiler ekleyebilirsiniz.
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    }
+  }
+};
+
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };
+```
+
+#### 4.3. Tokenlar
+
+Kimlik doğrulama ve güvenli bilgi taşıma amacıyla JSON Web Token’lar (JWT) kullanılır. Bir kullanıcı giriş yaptığında sunucu, kullanıcı bilgilerini içeren ve gizli bir anahtarla imzalanmış bir JWT oluşturur. Bu token, istemciye gönderilir ve sonraki kimlik doğrulama isteklerinde kullanılır.
+
+**Next.js’in route handlers özelliği, JWT oluşturma ve doğrulama işlemlerini güvenli bir şekilde gerçekleştirmek için ideal bir ortam sağlar.**
+
+Kimlik doğrulama ve güvenli veri iletimi için yaygın olarak kullanılan JSON Web Token’lar (JWT), genellikle iki farklı token türü içerir: access token ve refresh token.
+
+- **Access Token:** Bu token, kullanıcının kimliğini doğrulamak ve korumalı kaynaklara erişim sağlamak için kullanılır. Genellikle kısa ömürlüdür, kullanıcı giriş yaptığında sunucu, kullanıcı bilgilerini içeren ve güvenli bir şekilde imzalanmış bir access token oluşturur.
+
+- **Refresh Token:** Refresh token, daha uzun ömürlüdür ve access token süresi dolduğunda, refresh token kullanılarak yeni bir access token alınabilir. Bu sayede kullanıcının tekrar giriş yapmasına gerek kalmaz.
+
+Bu iki token türünün birlikte kullanılması, güvenliği artırır ve kullanıcı deneyimini iyileştirir. Access token’ın kısa ömürlü olması, olası bir çalınma durumunda riski sınırlar. Öte yandan, refresh token ise kullanıcıya daha uzun süreli oturum yönetimi sağlar.
+
+Örnek:
+
+```javascript
+import { NextResponse } from 'next/server';
+import { SignJWT, jwtVerify } from 'jose';
+
+export async function POST(request) {
+  const { userId } = await request.json();
+  
+  const accessToken = await new SignJWT({ userId })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('15m')
+    .sign(new TextEncoder().encode(process.env.JWT_SECRET));
+
+  const refreshToken = await new SignJWT({ userId })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('7d')
+    .sign(new TextEncoder().encode(process.env.REFRESH_SECRET));
+
+  return NextResponse.json({ accessToken, refreshToken });
+}
+
+export async function GET(request) {
+  const refreshToken = request.headers.get('Authorization')?.split(' ')[1];
+  if (!refreshToken) {
+    return NextResponse.json({ message: 'Refresh token required' }, { status: 401 });
+  }
+
+  try {
+    const { payload } = await jwtVerify(
+      refreshToken, 
+      new TextEncoder().encode(process.env.REFRESH_SECRET)
+    );
+
+    const newAccessToken = await new SignJWT({ userId: payload.userId })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setExpirationTime('15m')
+      .sign(new TextEncoder().encode(process.env.JWT_SECRET));
+
+    return NextResponse.json({ accessToken: newAccessToken });
+  } catch (error) {
+    return NextResponse.json({ message: 'Invalid refresh token' }, { status: 401 });
+  }
+}
+```
+
+#### 4.4. Middleware
+
+Next.js 12 ile tanıtılan Middleware özelliği, kimlik doğrulamayı merkezi ve güvenli bir şekilde yönetir. Sunucu tarafında çalışarak her isteği kontrol eder, token’ları doğrular ve gerekirse kullanıcıları giriş sayfasına yönlendirir. Bu işlemler, sayfa yüklenmeden gerçekleştiği için istemci tarafında hassas bilgi paylaşımı engellenir ve potansiyel saldırılara karşı ekstra güvenlik sağlanır.
+
+Örnek:
+
+```javascript
+// middleware.js
+import { NextResponse } from 'next/server';
+import { jwtVerify } from 'jose';
+
+async function verifyAuth(token) {
+  try {
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
+    return payload;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function middleware(request) {
+  const token = request.cookies.get('token')?.value;
+
+  if (!token || !(await verifyAuth(token))) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/profile/:path*'],
+};
+```
+
+#### 4.5. Server Components
+
+Server Components, kimlik doğrulama süreçlerinde birçok önemli avantaj sağlar. **Öncelikle, hassas kimlik doğrulama verileri ve mantığı tamamen sunucu tarafında işlendiği için, istemciye hassas bilgiler gönderilmez.** Bu durum, kimlik doğrulama işlemini olası XSS (Cross-Site Scripting) saldırılarına karşı daha güvenli hale getirir ve client-side saldırı risklerini azaltır.
+
+Ayrıca, kimlik doğrulama gibi yoğun iş yükleri sunucu üzerinde gerçekleştirilerek, istemci tarafında daha hızlı yükleme süreleri elde edilir. Bu, özellikle performans açısından ciddi bir kazanç sağlar.
+
+Örnek:
+
+```javascript
+// app/dashboard/page.js
+import { getServerSession } from "next-auth/next";
+import { redirect } from 'next/navigation';
+
+export default async function Dashboard() {
+  const session = await getServerSession();
+  if (!session) {
+    redirect('/login');
+  }
+// Server Components içinde session bilgileri güvenli bir şekilde işlenir.
+  return <DashboardContent user={session.user} />;
+}
+```
+
+#### 4.6. Server Actions
+Next.js 13.4 ile tanıtılan Server Actions, form işlemleri ve veri mutasyonlarını sunucu tarafında güvenli bir şekilde yönetir. Bu özellik, client-side JavaScript olmadan form gönderimlerinin işlenmesine olanak tanır ve otomatik CSRF (Cross-Site Request Forgery) koruması sağlar. Hassas verilerin sunucu tarafında işlenmesi, kimlik doğrulama gibi kritik süreçlerde ekstra güvenlik sağlar.
+
+Örnek:
+
+```javascript
+// app/login/actions.js
+'use server';
+
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  username: z.string().min(3),
+  password: z.string().min(8),
+});
+
+export async function login(formData) {
+  const result = loginSchema.safeParse({
+    username: formData.get('username'),
+    password: formData.get('password'),
+  });
+
+  if (!result.success) {
+    return { error: result.error.flatten() };
+  }
+
+// Kullanıcı doğrulama mantığı// ...
+
+  cookies().set('token', 'your-auth-token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  });
+
+  redirect('/dashboard');
+}
+
+// app/login/page.js
+import { login } from './actions';
+
+export default function LoginPage() {
+  return (
+    <form action={login}>
+      <input name="username" type="text" required />
+      <input name="password" type="password" required />
+      <button type="submit">Login</button>
+    </form>
+  );
+}
+```
+
+#### 4.7. Kimlik Doğrulama Sağlayıcıları
+
+Next.js, kullanıcı kimlik doğrulaması için çeşitli harici sağlayıcılarla uyumlu çalışabilir. Bu sağlayıcılar, kayıt olma, giriş yapma ve güvenlik token’larının yönetimi gibi karmaşık kullanıcı işlemlerini üstlenerek, geliştiricilerin kendi kimlik doğrulama sistemlerini sıfırdan oluşturma gereksinimini ortadan kaldırır.
+
+Bu amaçla kullanabileceğiniz popüler kütüphaneler:
+
+- NextAuth.js
+- Auth0
+- Clerk
+- Firebase Authentication
+- Supabase
+- Kinde
+- Lucia
+- Stack Auth
+- Stytch
+- WorkOS
+
+Bu sağlayıcılar, farklı özellikler ve entegrasyon yöntemleri sunar. Örneğin, bazıları sosyal giriş seçenekleri sunarken diğerleri daha gelişmiş güvenlik politikaları veya iş yerinde kullanım için optimize edilmiş çözümler sunar. Projenizin ihtiyaçlarına en uygun olanı seçmek, güvenli ve kullanıcı dostu bir kimlik doğrulama süreci oluşturmanın anahtarıdır.
+
+### 5.Sonuç
+
+Next.js, modern web uygulamaları için güçlü bir framework sunarken, kimlik doğrulama konusunda da esnek ve güvenli çözümler sunmaktadır. Route Handlers, Middleware, Server Components ve Server Actions gibi özellikler, geliştiricilere güvenli kimlik doğrulama sistemleri oluşturma konusunda geniş olanaklar sağlar.
+
+Kimlik doğrulama stratejisi seçerken uygulamanızın ihtiyaçlarını, kullanıcı deneyimini ve güvenlik hedeflerinizi düşünmelisiniz. Her yöntemin kendine özgü avantajları ve zorlukları vardır. Next.js’in sunduğu araçları ve özellikleri etkin bir şekilde kullanarak güvenli, ölçeklenebilir ve kullanıcı dostu kimlik doğrulama sistemleri oluşturabilirsiniz.
+
+### 6. Referanslar ve Ek Kaynaklar
+
+1. Next.js Resmi Dokümanı: [Authentication](https://nextjs.org/docs/pages/building-your-application/authentication)
+
+2. Frontegg Blog: [Next.js Authentication: Examples & Libraries to Get You Started](https://frontegg.com/blog/next-js-authentication) 
+
+3. NextAuth.js Dokümanı: [Getting Started](https://next-auth.js.org/getting-started/introduction)
+
+4. JWT.io: [Introduction to JSON Web Tokens](https://jwt.io/introduction)
+
+5. Web Authentication API (WebAuthn): [MDN Docs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)
+
+Bu kaynaklar, Next.js’te kimlik doğrulama ve güvenlik konularında daha derinlemesine bilgi edinmenize yardımcı olacaktır. Keyifli okumalar dilerim.

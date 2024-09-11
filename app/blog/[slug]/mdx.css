@@ -6,6 +6,15 @@
   @apply text-zinc-100 font-bold mb-4;
 }
 
+.prose > *:first-child::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 1px;
+  background-color: #4b5563; /* zinc-600 rengi, isteğe bağlı olarak değiştirilebilir */
+  margin-bottom: 2rem;
+}
+
 .prose h1 {
   @apply text-3xl md:text-4xl mt-8;
 }
@@ -132,6 +141,21 @@
 
 [data-rehype-pretty-code-fragment] .line--highlighted {
   @apply bg-zinc-700 bg-opacity-50;
+}
+
+.prose img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.prose img + em {
+  display: block;
+  text-align: center;
+  font-style: italic;
+  margin-top: 10px;
+  color: #9CA3AF; /* text-gray-400 */
 }
 
 [data-rehype-pretty-code-fragment] .word--highlighted {
