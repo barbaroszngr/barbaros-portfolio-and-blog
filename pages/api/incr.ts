@@ -16,12 +16,18 @@ export default async function incr(req: NextRequest): Promise<NextResponse> {
 
   const body = await req.json();
   let slug: string | undefined = undefined;
+  let type: "blog" | "projects" = "blog"; // Default to blog
+
   if ("slug" in body) {
     slug = body.slug;
+  }
+  if ("type" in body) {
+    type = body.type === "projects" ? "projects" : "blog";
   }
   if (!slug) {
     return new NextResponse("Slug not found", { status: 400 });
   }
+
   const ip = req.ip;
   if (ip) {
     // Hash the IP in order to not store it directly in your db.
@@ -39,9 +45,10 @@ export default async function incr(req: NextRequest): Promise<NextResponse> {
       ex: 24 * 60 * 60,
     });
     if (!isNew) {
-      new NextResponse(null, { status: 202 });
+      return new NextResponse(null, { status: 202 });
     }
   }
-  await redis.incr(["pageviews", "projects", slug].join(":"));
+
+  await redis.incr(["pageviews", type, slug].join(":"));
   return new NextResponse(null, { status: 202 });
 }
