@@ -13,29 +13,34 @@ export const revalidate = 60;
 export default async function ProjectsPage() {
   const views = (
     await redis.mget<number[]>(
-      ...allProjects.map((p) => ["pageviews", "projects", p.slug].join(":")),
+      ...allProjects.map((p) => ["pageviews", "projects", p.slug].join(":"))
     )
   ).reduce((acc, v, i) => {
     acc[allProjects[i].slug] = v ?? 0;
     return acc;
   }, {} as Record<string, number>);
 
-  const featured = allProjects.find((project) => project.slug === "unkey") ?? allProjects[0];
-  const top2 = allProjects.find((project) => project.slug === "highstorm") ?? allProjects[1];
-  const top3 = allProjects.find((project) => project.slug === "planetfall") ?? allProjects[2];
-  
+  const featured =
+    allProjects.find((project) => project.slug === "unkey") ?? allProjects[0];
+  const top2 =
+    allProjects.find((project) => project.slug === "highstorm") ??
+    allProjects[1];
+  const top3 =
+    allProjects.find((project) => project.slug === "planetfall") ??
+    allProjects[2];
+
   const sorted = allProjects
-    .filter((p) => p.published)
+    //.filter((p) => p.published)
     .filter(
       (project) =>
         project.slug !== featured.slug &&
         project.slug !== top2?.slug &&
-        project.slug !== top3?.slug,
+        project.slug !== top3?.slug
     )
     .sort(
       (a, b) =>
         new Date(b.date ?? Number.POSITIVE_INFINITY).getTime() -
-        new Date(a.date ?? Number.POSITIVE_INFINITY).getTime(),
+        new Date(a.date ?? Number.POSITIVE_INFINITY).getTime()
     );
 
   return (
@@ -71,7 +76,7 @@ export default async function ProjectsPage() {
                   <span className="flex items-center gap-1 text-xs text-zinc-500">
                     <Eye className="w-4 h-4" />{" "}
                     {Intl.NumberFormat("en-US", { notation: "compact" }).format(
-                      views[featured.slug] ?? 0,
+                      views[featured.slug] ?? 0
                     )}
                   </span>
                 </div>
@@ -102,36 +107,12 @@ export default async function ProjectsPage() {
             ))}
           </div>
         </div>
-        <div className="hidden w-full h-px md:block bg-zinc-800" />
-
-        <div className="grid grid-cols-1 gap-4 mx-auto lg:mx-0 md:grid-cols-3">
-          <div className="grid grid-cols-1 gap-4">
-            {sorted
-              .filter((_, i) => i % 3 === 0)
-              .map((project) => (
-                <Card key={project.slug}>
-                  <Article project={project} views={views[project.slug] ?? 0} />
-                </Card>
-              ))}
-          </div>
-          <div className="grid grid-cols-1 gap-4">
-            {sorted
-              .filter((_, i) => i % 3 === 1)
-              .map((project) => (
-                <Card key={project.slug}>
-                  <Article project={project} views={views[project.slug] ?? 0} />
-                </Card>
-              ))}
-          </div>
-          <div className="grid grid-cols-1 gap-4">
-            {sorted
-              .filter((_, i) => i % 3 === 2)
-              .map((project) => (
-                <Card key={project.slug}>
-                  <Article project={project} views={views[project.slug] ?? 0} />
-                </Card>
-              ))}
-          </div>
+        <div className="grid grid-cols-1 gap-4 mx-auto lg:mx-0">
+          {sorted.map((project) => (
+            <Card key={project.slug}>
+              <Article project={project} views={views[project.slug] ?? 0} />
+            </Card>
+          ))}
         </div>
       </div>
     </div>
