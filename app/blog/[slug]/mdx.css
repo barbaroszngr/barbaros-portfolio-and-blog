@@ -1,0 +1,148 @@
+.prose {
+  @apply text-zinc-300 max-w-none mx-auto;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  @apply text-zinc-100 font-bold mb-4;
+}
+
+.prose h1 {
+  @apply text-3xl md:text-4xl mt-8;
+}
+
+.prose h2 {
+  @apply text-2xl md:text-3xl mt-8;
+}
+
+.prose h3 {
+  @apply text-xl md:text-2xl mt-6;
+}
+
+.prose p {
+  @apply mb-4 leading-relaxed;
+}
+
+.prose ul, .prose ol {
+  @apply mb-4 pl-5;
+}
+
+.prose li {
+  @apply mb-2;
+}
+
+.prose a {
+  @apply text-blue-400 hover:text-blue-300 transition-colors;
+}
+
+.prose strong {
+  @apply text-zinc-200;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-zinc-700 pl-4 italic my-4;
+}
+
+.prose code {
+  @apply bg-zinc-800 text-zinc-200 px-1 py-0.5 rounded text-sm;
+}
+
+.prose pre {
+  @apply bg-zinc-800 p-4 rounded-lg overflow-x-auto my-4;
+}
+
+.prose pre code {
+  @apply bg-transparent p-0 text-sm;
+}
+
+.prose img {
+  @apply rounded-lg my-4;
+}
+
+.prose table {
+  @apply w-full border-collapse my-4;
+}
+
+.prose th, .prose td {
+  @apply border border-zinc-700 px-3 py-2;
+}
+
+.prose th {
+  @apply bg-zinc-800;
+}
+
+@media (max-width: 768px) {
+  .prose {
+    @apply text-base;
+  }
+  
+  .prose h1 {
+    @apply text-3xl;
+  }
+  
+  .prose h2 {
+    @apply text-2xl;
+  }
+  
+  .prose h3 {
+    @apply text-xl;
+  }
+}
+
+@media (max-width: 640px) {
+  .prose {
+    @apply text-sm;
+  }
+  
+  .prose h1 {
+    @apply text-2xl;
+  }
+  
+  .prose h2 {
+    @apply text-xl;
+  }
+  
+  .prose h3 {
+    @apply text-lg;
+  }
+}
+
+[data-rehype-pretty-code-fragment] {
+  @apply my-4;
+}
+
+[data-rehype-pretty-code-fragment] code {
+  @apply grid min-w-full break-words rounded-lg border-0 bg-zinc-800 p-4 text-sm text-zinc-200;
+  counter-reset: line;
+  box-decoration-break: clone;
+}
+
+[data-rehype-pretty-code-fragment] .line {
+  @apply px-4 py-1;
+}
+
+[data-rehype-pretty-code-fragment] [data-line-numbers] > .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 1rem;
+  margin-right: 1rem;
+  text-align: right;
+  color: gray;
+}
+
+[data-rehype-pretty-code-fragment] .line--highlighted {
+  @apply bg-zinc-700 bg-opacity-50;
+}
+
+[data-rehype-pretty-code-fragment] .word--highlighted {
+  @apply bg-zinc-700 bg-opacity-50 rounded px-1 py-0.5;
+}
+
+[data-rehype-pretty-code-title] {
+  @apply mt-4 py-2 px-4 text-sm font-medium bg-zinc-700 rounded-t-lg;
+}
+
+[data-rehype-pretty-code-title] + pre {
+  @apply mt-0 rounded-t-none;
+}
+
