@@ -18,7 +18,7 @@ const redis = Redis.fromEnv();
 
 export async function generateStaticParams(): Promise<Props["params"][]> {
   return allProjects
-    .filter((p) => p.published)
+    //.filter((p) => p.published)
     .map((p) => ({
       slug: p.slug,
     }));
