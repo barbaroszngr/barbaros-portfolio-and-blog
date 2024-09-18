@@ -36,12 +36,10 @@ export default function Home() {
 
       <div className="hidden w-screen h-px animate-glow md:block animate-fade-right bg-gradient-to-r from-zinc-300/0 via-zinc-300/50 to-zinc-300/0" />
       <div className="my-16 text-center animate-fade-in">
-        <h2 className="text-sm text-zinc-500 ">
-          Driven by a passion for both creativity and technology, I build
-          intuitive digital experiences and continuously challenge the limits of
-          software development.
-        </h2>
-      </div>
+  <h2 className="text-sm text-zinc-500 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    I'm a Full Stack Developer who thrives on solving complex problems with innovative solutions. As a passionate software developer, I'm committed to continuous improvement and delivering high-quality results in every project I undertake.
+  </h2>
+</div>
     </div>
   );
 }

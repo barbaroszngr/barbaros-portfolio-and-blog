@@ -26,7 +26,7 @@ export default async function ProjectsPage() {
     allProjects.find((project) => project.slug === "saas-ai-chatbot") ??
     allProjects[1];
   const top3 =
-    allProjects.find((project) => project.slug === "planetfall") ??
+    allProjects.find((project) => project.slug === "e-commerce") ??
     allProjects[2];
 
   const sorted = allProjects
