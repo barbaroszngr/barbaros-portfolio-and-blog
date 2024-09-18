@@ -1,0 +1,27 @@
+---
+title: .NET Core & Angular E-commerce Platform (API)
+description: This project offers a comprehensive backend solution for an e-commerce platform, built using .NET 6. It follows Onion Architecture and Clean Architecture principles, ensuring a maintainable and scalable codebase. The API integrates PostgreSQL for database management, implements JWT-based authentication, and uses SignalR for real-time communications. It leverages Entity Framework Core for ORM capabilities and employs MediatR for CQRS pattern implementation. Data validation is handled through FluentValidation. The project also includes advanced logging features with Serilog. This robust API is designed to cater to a wide range of e-commerce operations, from small businesses to large-scale online retailers, offering a flexible and secure infrastructure for modern e-commerce needs.
+date: "2023-11-10"
+published: true
+repository: barbaroszngr/ETicaretAPI
+---
+
+
+Detailed Overview
+
+Key Features and Technical Details:
+
+The e-commerce API is built on a layered architecture, ensuring modularity and maintainability. The Domain Layer houses fundamental data models and business logic, incorporating user management through Microsoft.AspNetCore.Identity.
+
+In the Application Layer, business rules are implemented. The CQRS pattern is applied using MediatR, allowing for a clear separation of command and query operations. Data validation is handled by FluentValidation, ensuring data integrity throughout the system.
+
+The Infrastructure Layer manages external service integrations. It handles connections to services like Azure Blob Storage for file management and configures the JWT-based authentication system, providing secure access to API endpoints.
+
+Database operations are managed in the Persistence Layer. PostgreSQL serves as the database, interfaced through Entity Framework Core. This layer implements the repository pattern, abstracting data access complexities and enhancing testability.
+
+Real-time features are powered by the SignalR Layer, enabling instant notifications and live updates for a dynamic user experience.
+
+The Presentation Layer exposes RESTful API endpoints, adhering to best practices in API design. Comprehensive logging is implemented using Serilog, facilitating effective tracking and debugging of issues.
+
+The application prioritizes performance, security, and scalability. Its clean code structure and advanced features make the API suitable for various e-commerce operations, from small businesses to large-scale retail platforms.
+This combination of technologies and architectural patterns creates a robust, flexible, and secure foundation for modern e-commerce needs. The API is equipped to handle complex inventory management, order processing, and customer data management, addressing the challenges of the digital marketplace.
