@@ -99,14 +99,15 @@ const components = {
 		className,
 		alt,
 		...props
-	}: React.ImgHTMLAttributes<HTMLImageElement>) => (
-		// eslint-disable-next-line @next/next/no-img-element
-		<img
-			className={clsx("rounded-md border border-zinc-200", className)}
-			alt={alt}
-			{...props}
+	  }: React.ImgHTMLAttributes<HTMLImageElement>) => (
+		<Image
+		  className={clsx("rounded-md border border-zinc-200", className)}
+		  alt={alt}
+		  width={720}
+		  height={480}
+		  {...props}
 		/>
-	),
+	  ),
 	hr: ({ ...props }) => (
 		<hr className="my-4 border-zinc-200 md:my-8" {...props} />
 	),
