@@ -100,13 +100,17 @@ const components = {
 		alt,
 		...props
 	  }: React.ImgHTMLAttributes<HTMLImageElement>) => (
-		<Image
-		  className={clsx("rounded-md border border-zinc-200", className)}
-		  alt={alt}
-		  width={720}
-		  height={480}
-		  {...props}
-		/>
+		<div className="my-4 flex justify-center">
+		  <Image
+			className={clsx("rounded-md", className)}
+			alt={alt}
+			{...props}
+			width={0}
+			height={0}
+			sizes="100vw"
+			style={{ width: '100%', height: 'auto' }}
+		  />
+		</div>
 	  ),
 	hr: ({ ...props }) => (
 		<hr className="my-4 border-zinc-200 md:my-8" {...props} />
