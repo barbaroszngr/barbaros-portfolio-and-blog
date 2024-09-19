@@ -6,6 +6,9 @@ const nextConfig = {
 	experimental: {
 		mdxRs: true,
 	},
+	images: {
+		domains: ["miro.medium.com"],
+	},
 };
 
 export default withContentlayer(nextConfig);
