@@ -115,14 +115,16 @@
   }
 }
 
+
 [data-rehype-pretty-code-fragment] {
-  @apply my-4;
+  @apply my-4 overflow-x-auto;
 }
 
 [data-rehype-pretty-code-fragment] code {
   @apply grid min-w-full break-words rounded-lg border-0 bg-zinc-800 p-4 text-sm text-zinc-200;
   counter-reset: line;
   box-decoration-break: clone;
+  width: max-content;
 }
 
 [data-rehype-pretty-code-fragment] .line {
