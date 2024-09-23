@@ -41,7 +41,7 @@ export default async function BlogPost({ params }: Props) {
            
             <Header post={post} views={views} />
             <ReportView slug={post.slug} />
-            <article className="mt-8 prose prose-invert prose-quoteless">
+            <article className="mt-8 prose prose-invert prose-quoteless overflow-hidden">
               <Mdx code={post.body.code} />
             </article>
             <div className="mt-8">
